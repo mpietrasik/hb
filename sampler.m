@@ -2,13 +2,10 @@
 %
 % Outputs a cell array of structs containing path/level samples.
 
-function samples = sampler(E, K, mu, sigma, gamma, lambda, eta, GS_PARAM, SEED, NUM_THREADS)
+function samples = sampler(N, R, L, mu, sigma, gamma, lambda, eta, GS_PARAM, SEED, NUM_THREADS, useHpTuning)
     
     useHpTuning = [true true true]; % Use hyperparameter tuning for gamma, (mu,sigma) and (lambda,eta) respectively?
-    
-    % Constants
-    N       = size(E,1);
-    
+   
     % Declare return variables
     samples = cell(1,GS_PARAM.NUM_SAMPLES);
     
@@ -21,7 +18,7 @@ function samples = sampler(E, K, mu, sigma, gamma, lambda, eta, GS_PARAM, SEED, 
             if ~isfield(GS_PARAM,'RANDOM_INTEGER_INIT') || GS_PARAM.RANDOM_INTEGER_INIT == false
 
                 % For now just declare empty inputs.
-                paths = uint16(zeros(N,K));
+                paths = uint16(zeros(N,L));
                 z_r = uint16(zeros(N,N));
                 z_l = uint16(zeros(N,N));
                 INITIALIZE  = true;
@@ -29,11 +26,11 @@ function samples = sampler(E, K, mu, sigma, gamma, lambda, eta, GS_PARAM, SEED, 
 
             else
 
-                % Initialize by drawing random integers in [1,K].
+                % Initialize by drawing random integers in [1,L].
                 rng = RandStream('mt19937ar','Seed',SEED);
-                paths = uint16(rng.randi(K,N,K));
-                z_r = uint16(rng.randi(K,N,N));
-                z_l = uint16(rng.randi(K,N,N));
+                paths = uint16(rng.randi(L,N,L));
+                z_r = uint16(rng.randi(L,N,N));
+                z_l = uint16(rng.randi(L,N,N));
                 INITIALIZE  = false;
                 disp('...Using random-integer initialization');
             end
@@ -43,7 +40,7 @@ function samples = sampler(E, K, mu, sigma, gamma, lambda, eta, GS_PARAM, SEED, 
         end
 
         fprintf('...Taking sample %d/%d (burn-in/lag for %d iterations)\n',i,GS_PARAM.NUM_SAMPLES,ITERS);
-        [paths, z_r, z_l ,mu, sigma, gamma, lambda, eta, ll] = hmmsb_gs_core(E, mu, sigma, gamma, lambda, eta, paths, z_r, z_l, ITERS+1, SEED+i-1, NUM_THREADS, INITIALIZE, useHpTuning);
+        [paths, z_r, z_l ,mu, sigma, gamma, lambda, eta, ll] = gateway(N, R, mu, sigma, gamma, lambda, eta, paths, z_r, z_l, ITERS+1, SEED+i-1, NUM_THREADS, INITIALIZE, useHpTuning);
         
         % Save the sample
         samples{i}.paths = paths;

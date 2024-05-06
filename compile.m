@@ -6,6 +6,6 @@
 BOOST_PATH      = 'C:/Users/marci/boost_1_67_0_old_pc';            
 BOOST_LIB_PATH  = 'C:/Users/marci/boost_1_67_0_old_pc/stage/lib'; 
 
-eval(['mex COMPFLAGS="$COMPFLAGS -I' BOOST_PATH '" LINKFLAGS="$LINKFLAGS /LIBPATH:' BOOST_LIB_PATH '" sampler.cpp'])
+eval(['mex COMPFLAGS="$COMPFLAGS -I' BOOST_PATH '" LINKFLAGS="$LINKFLAGS /LIBPATH:' BOOST_LIB_PATH '" gateway.cpp'])
 
 clear BOOST_PATH BOOST_LIB_PATH;
